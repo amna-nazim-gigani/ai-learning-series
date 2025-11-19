@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Configure Gemini API
-API_KEY = os.getenv("GEMINI_API_KEY")
+API_KEY ="AIzaSyBbKBVBiiMuQzfI8CSiIqC02bNXJ_1-nI0"
 if not API_KEY:
     raise ValueError(
         "GEMINI_API_KEY not found in environment variables. "
@@ -115,3 +115,37 @@ def main():
 
 if __name__ == "__main__":
     main()
+import json
+
+# Load WCC FAQs
+with open("wcc_faqs.json") as f:
+    wcc_data = json.load(f)
+
+# Create FAQ context
+faq_text = "\n".join([
+    f"Q: {faq['question']}\nA: {faq['answer']}"
+    for faq in wcc_data["faqs"]
+])
+
+# Create system prompt with WCC knowledge
+system_prompt = f"""You are Maya, the enthusiastic WCC assistant!
+You love helping women in tech and are passionate about community.
+Always be encouraging and supportive.
+Use emojis occasionally to add warmth and supportiveness.
+Also be kind and inclusive in your responses.
+
+Here are the FAQs you should reference:
+{faq_text}
+
+Be warm, encouraging, and inclusive. If you don't know something, suggest they contact the WCC team.
+"""
+
+import logging
+
+logging.basicConfig(filename='chatbot.log', level=logging.INFO)
+
+def log_conversation(user_msg, bot_response):
+    logging.info(f"User: {user_msg}")
+    logging.info(f"Bot: {bot_response}")
+
+bot = SimpleBot(system_prompt=system_prompt)
